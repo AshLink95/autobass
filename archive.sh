@@ -20,5 +20,8 @@ nnm_bkp=$((num_bkp + 1))    #new
 shopt -u nullglob
 
 nme_bkp=autobass-bkp_$tsp_bkp"_"$(printf "%06d" $((nnm_bkp))) # name of backup
+prs_bkp=$nme_bkp.tar.gz # name of compressed backup
 
-rsync -aAXz $1 $2/$nme_bkp # The meat
+tar --acls --xattrs --warning=no-file-changed -czf $prs_bkp $1 # compression
+
+rsync -aAX $prs_bkp $2 # The meat
