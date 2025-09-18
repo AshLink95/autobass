@@ -9,3 +9,5 @@ If we want to backup `dir1` in `dir2`, we can do
 ```bash
 ./archive.sh dir1 dir2
 ```
+
+This creates a compressed `tar.gz` file in dir2 that, when decompressed, replicates everything included in the directory.

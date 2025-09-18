@@ -3,7 +3,7 @@
 # Check for help flag and arguments
 if [[ $1 == "-h" || $1 == "--help" ]]; then
     echo "Usage: ./archive.sh sourcedir targetdir"
-    echo "  backup sourcedir in targetdir"
+    echo "  backup sourcedir in targetdir as a compressed tar.gz file"
     exit
 elif [[ $# -ne 2 || ! -d $1 || ! -d $2 ]]; then
     echo "Try -h or --help for more information"
