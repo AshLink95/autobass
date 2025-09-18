@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# Check for help flag and arguments
 if [[ $1 == "-h" || $1 == "--help" ]]; then
     echo "Usage: ./archive.sh sourcedir targetdir"
     echo "  backup sourcedir in targetdir"
@@ -20,4 +21,4 @@ shopt -u nullglob
 
 nme_bkp=autobass-bkp_$tsp_bkp"_"$(printf "%06d" $((nnm_bkp))) # name of backup
 
-rsync -aAXz $1 $2/$nme_bkp
+rsync -aAXz $1 $2/$nme_bkp # The meat
