@@ -1,34 +1,56 @@
 #!/bin/bash
 
-
-# Check for help flag and arguments
-if [[ $# -eq 1 && ($1 == "-h" || $1 == "--help")]]; then
-    echo "Usage: ./archive.sh sourcedir targetdir"
-    echo "  backup sourcedir in targetdir as a compressed tar.gz file"
-    exit
-fi
-
-# Check for sourcing
-if [[ $# -ne 2 && ! -f archive.conf ]]; then
-    echo "archive.conf doesn't exist! Try ./archive.sh --help for proper use"
-    exit
-else
-    source archive.conf
-    if [[ (-n $SRC && -n $TRG) && (-d $SRC && -d $TRG) ]]; then
-        set -- $SRC $TRG
-    else
-        echo "Invalid archive.conf! Must store directories in SRC and TRG"
-        exit
-    fi
-fi
-
-
 # Log setup
 tlog() { date -u +%FT%TZ; }
 log=archive.log
 touch $log
 ms1_log="INFO : "
 ms2_log="ERROR: "
+
+
+# Check for help flag and arguments
+if [[ $# -eq 1 && ($1 == "-h" || $1 == "--help")]]; then
+    echo "Usage: ./archive.sh sourcedir targetdir"
+    echo "  backup sourcedir in targetdir as a compressed tar.gz file"
+    echo "./archive.sh -d (or --dry-run)"
+    echo "  check which patterns to ignore"
+    exit
+elif [[ $# -eq 1 && ($1 == "-d" || $1 == "--dry-run") ]]; then
+    # program run log
+    tsp_log=$(tlog)
+    echo $ms1_log$tsp_log" Dry-run enabled. Simulating backup" >> $log
+    if [[ -f .bassignore ]]; then
+        cat .bassignore
+        tsp_log=$(tlog)
+        echo $ms1_log$tsp_log" Dry-run successful" >> $log
+    else 
+        echo "No .bassignore file!"
+        tsp_log=$(tlog)
+        echo $ms2_log$tsp_log" Dry-run failed" >> $log
+    fi
+    exit
+fi
+
+# Check for sourcing + Directory validity check
+if [[ $# -ne 2 ]]; then
+    if [[ ! -f archive.conf ]]; then
+        echo "archive.conf doesn't exist! Try ./archive.sh --help for proper use"
+        exit
+    else
+        source archive.conf
+        if [[ (-n $SRC && -n $TRG) && (-d $SRC && -d $TRG) ]]; then
+            set -- $SRC $TRG
+        else
+            echo "Invalid archive.conf! Must store directories in SRC and TRG"
+            exit
+        fi
+    fi
+else 
+    if [[ ! -d $1 || ! -d $2 ]]; then
+        echo "Invalid arguments! Try -h or --help for more information"
+        exit
+    fi
+fi
 
 # program run log
 tsp_log=$(tlog)
@@ -67,7 +89,11 @@ tsp_log=$(tlog)
 echo $ms1_log$tsp_log" Backing up from "$1" to "$2 >> $log
 
 # compression
-tar --acls --xattrs --ignore-failed-read --exclude=$prs_bkp -czf $prs_bkp $1 &> /dev/null
+# if [[ -f .bassignore ]]; then
+    tar --acls --xattrs --ignore-failed-read --exclude=$prs_bkp --exclude-ignore-recursive=.bassignore -czf $prs_bkp $1 &> /dev/null
+# else
+#     tar --acls --xattrs --ignore-failed-read --exclude=$prs_bkp -czf $prs_bkp $1 &> /dev/null
+# fi
 if [[ $? -ne 0 ]]; then
     tsp_log=$(tlog)
     echo $ms2_log$tsp_log" Backup failed during compression" >> $log
@@ -76,7 +102,8 @@ if [[ $? -ne 0 ]]; then
 fi
 
 # transfer (The meat)
-rsync -aAX $prs_bkp $2
+rsync -aAX "$prs_bkp" "$2"
+# fi
 if [[ $? -ne 0 ]]; then
     tsp_log=$(tlog)
     echo $ms2_log$tsp_log" Backup failed during transfer" >> $log

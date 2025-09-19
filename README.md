@@ -20,3 +20,16 @@ This can only be done if we have the file `archive.conf` in the working director
 SRC=dir1
 TRG=dir1
 ```
+To ignore certain file or directory patterns in `dir1` and not have them backed up, write them in a `.bassignore` file.
+
+For example, if we want to ignore backups and logs in the same file, we must have the following in our `.bassignore` file:
+```.bassignore
+autobass-bkp*
+*.log
+```
+
+To check what patterns we're excluding,
+```bash
+./archive.sh -d
+```
+> `-d` is short for `--dry-run`. You can use both.
