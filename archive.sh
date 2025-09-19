@@ -2,8 +2,17 @@
 
 # Check for help flag and arguments
 if [[ $1 == "-h" || $1 == "--help" ]]; then
-    echo "Usage: ./archive.sh sourcedir targetdir"
+    echo "./archive.sh sourcedir targetdir"
     echo "  backup sourcedir in targetdir"
+    echo "./archive.sh -d (or --dry-run)"
+    echo "  check which patterns to ignore"
+    exit
+elif [[ $1 == "-d" || $1 == "--dry-run" ]]; then
+    if [[ -f .bassignore ]]; then
+        cat .bassignore
+    else 
+        echo "No .bassignore file!"
+    fi
     exit
 elif [[ $# -ne 2 || ! -d $1 || ! -d $2 ]]; then
     echo "Try -h or --help for more information"

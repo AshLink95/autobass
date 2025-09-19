@@ -17,3 +17,9 @@ For example, if we want to ignore backups and logs in the same file, we must hav
 autobass-bkp*
 *.log
 ```
+
+To check what patterns we're excluding,
+```bash
+./archive.sh -d
+```
+> `-d` is short for `--dry-run`. You can use both.
