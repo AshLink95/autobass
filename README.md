@@ -1,6 +1,6 @@
-<center><h1>AutoBaSS</h1></center>
+<h1 align="center">AutoBaSS</h1>
 
-> <small><span style="color:gray;">This repo is part of an assignment for CSE 337 at Stony Brook University</span></small>
+> <sub>This repo is part of an assignment for CSE 337 at Stony Brook University</sub>
 
 AutoBaSS  is an automated Backup & Sync System that enables users to backup a directory in another.
 

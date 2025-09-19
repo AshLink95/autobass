@@ -50,7 +50,7 @@ tsp_log=$(tlog)
 echo $ms1_log$tsp_log" Backing up from "$1" to "$2 >> $log
 
 # compression
-tar --acls --xattrs --warning=no-file-changed -czf $prs_bkp $1
+tar --acls --xattrs --ignore-failed-read --exclude=$prs_bkp -czf $prs_bkp $1 &> /dev/null
 if [ $? -ne 0 ]; then
     tsp_log=$(tlog)
     echo $ms2_log$tsp_log" Backup failed during compression" >> $log
@@ -59,7 +59,7 @@ fi
 
 # transfer (The meat)
 rsync -aAX $prs_bkp $2
-if [ $? -ne 0 ]; then
+if [[ $? -ne 0 ]]; then
     tsp_log=$(tlog)
     echo $ms2_log$tsp_log" Backup failed during transfer" >> $log
     exit
