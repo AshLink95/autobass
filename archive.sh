@@ -7,7 +7,7 @@ if [[ $1 == "-h" || $1 == "--help" ]]; then
     exit
 elif [[ $# -ne 2 ]]; then
     source archive.conf
-    if [[ (-n $SRC && -n $TRG) && (-d $SRC && -d $TRG) ]]; then
+    if [[ (-f archive.conf) && (-n $SRC && -n $TRG) && (-d $SRC && -d $TRG) ]]; then
         set -- $SRC $TRG
     else
         echo "Invalid archive.conf! Must store directories in SRC and TRG"
