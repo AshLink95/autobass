@@ -14,11 +14,16 @@ tsp_bkp=$(date +%Y)$(date +%m)$(date +%e) # timestamp of backup
 
 # get the new number of backups
 shopt -s nullglob
-files=(autobass-bkp_"$tsp_bkp"*)
+files=($2/autobass-bkp_"$tsp_bkp"*)
 num_bkp=${#files[@]}        #old
 nnm_bkp=$((num_bkp + 1))    #new
 shopt -u nullglob
 
 nme_bkp=autobass-bkp_$tsp_bkp"_"$(printf "%06d" $((nnm_bkp))) # name of backup
 
-rsync -aAXz $1 $2/$nme_bkp # The meat
+# The meat
+if [[ -f .bassignore ]]; then
+    rsync -aAXz --exclude-from='.bassignore' $1 $2/$nme_bkp
+else
+    rsync -aAXz $1 $2/$nme_bkp
+fi

@@ -9,3 +9,11 @@ If we want to backup `dir1` in `dir2`, we can do
 ```bash
 ./archive.sh dir1 dir2
 ```
+
+To ignore certain file or directory patterns in `dir1` and not have them backed up, write them in a `.bassignore` file.
+
+For example, if we want to ignore backups and logs in the same file, we must have the following in our `.bassignore` file:
+```.bassignore
+autobass-bkp*
+*.log
+```
