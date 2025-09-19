@@ -1,10 +1,18 @@
 #!/bin/bash
 
 # Check for help flag and arguments
-if [[ $# -eq 1 && ($1 == "-h" || $1 == "--help") || $# -ne 2 ]]; then
+if [[ $# -eq 1 && ($1 == "-h" || $1 == "--help")]]; then
     echo "Usage: ./archive.sh sourcedir targetdir"
     echo "  backup sourcedir in targetdir as a compressed tar.gz file"
     exit
+elif [[ $# -ne 2 ]]; then
+    source archive.conf
+    if [[ (-f archive.conf) && (-n $SRC && -n $TRG) && (-d $SRC && -d $TRG) ]]; then
+        set -- $SRC $TRG
+    else
+        echo "Invalid archive.conf! Must store directories in SRC and TRG"
+        exit
+    fi
 fi
 
 # Log setup
@@ -36,7 +44,8 @@ fi
 # Backup file name
 tsp_bkp=$(date +%Y)$(date +%m)$(date +%e) # timestamp of backup
 
-shopt -s nullglob # get the new number of backups
+# get the new number of backups
+shopt -s nullglob
 files=($2/autobass-bkp_"$tsp_bkp"*)
 num_bkp=${#files[@]}        #old
 nnm_bkp=$((num_bkp + 1))    #new
@@ -54,6 +63,7 @@ tar --acls --xattrs --ignore-failed-read --exclude=$prs_bkp -czf $prs_bkp $1 &> 
 if [ $? -ne 0 ]; then
     tsp_log=$(tlog)
     echo $ms2_log$tsp_log" Backup failed during compression" >> $log
+    echo "Backup failed during compression"
     exit
 fi
 
@@ -62,6 +72,7 @@ rsync -aAX $prs_bkp $2
 if [[ $? -ne 0 ]]; then
     tsp_log=$(tlog)
     echo $ms2_log$tsp_log" Backup failed during transfer" >> $log
+    echo "Backup failed during transfer"
     exit
 elif [[ $1 != $2 ]]; then
     rm $prs_bkp
@@ -70,3 +81,4 @@ fi
 # Backup success log
 tsp_log=$(tlog)
 echo $ms1_log$tsp_log" Backup completed successfully" >> $log
+echo "Backup completed successfully"
