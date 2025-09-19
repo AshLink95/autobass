@@ -1,19 +1,27 @@
 #!/bin/bash
 
+
 # Check for help flag and arguments
 if [[ $# -eq 1 && ($1 == "-h" || $1 == "--help")]]; then
     echo "Usage: ./archive.sh sourcedir targetdir"
     echo "  backup sourcedir in targetdir as a compressed tar.gz file"
     exit
-elif [[ $# -ne 2 ]]; then
+fi
+
+# Check for sourcing
+if [[ $# -ne 2 && ! -f archive.conf ]]; then
+    echo "archive.conf doesn't exist! Try ./archive.sh --help for proper use"
+    exit
+else
     source archive.conf
-    if [[ (-f archive.conf) && (-n $SRC && -n $TRG) && (-d $SRC && -d $TRG) ]]; then
+    if [[ (-n $SRC && -n $TRG) && (-d $SRC && -d $TRG) ]]; then
         set -- $SRC $TRG
     else
         echo "Invalid archive.conf! Must store directories in SRC and TRG"
         exit
     fi
 fi
+
 
 # Log setup
 tlog() { date -u +%FT%TZ; }
@@ -60,7 +68,7 @@ echo $ms1_log$tsp_log" Backing up from "$1" to "$2 >> $log
 
 # compression
 tar --acls --xattrs --ignore-failed-read --exclude=$prs_bkp -czf $prs_bkp $1 &> /dev/null
-if [ $? -ne 0 ]; then
+if [[ $? -ne 0 ]]; then
     tsp_log=$(tlog)
     echo $ms2_log$tsp_log" Backup failed during compression" >> $log
     echo "Backup failed during compression"
